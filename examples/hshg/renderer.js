@@ -1,7 +1,7 @@
 const PIXI = require('pixi.js');
 const Renderer = require('lance-gg').render.Renderer;
 
-class SpaaaceRenderer extends Renderer {
+class TestRenderer extends Renderer {
 
     get ASSETPATHS() {
         return {
@@ -16,12 +16,23 @@ class SpaaaceRenderer extends Renderer {
         super(gameEngine, clientEngine);
         this.sprites = {};
         this.isReady = false;
+
+        this.gameEngine.on('collisionStart', collisionPair => {
+            this.drawObj(collisionPair.o1 , 0xFF0000);
+            this.drawObj(collisionPair.o2 , 0xFF0000);
+        });
+
+        this.gameEngine.on('collisionStop', collisionPair => {
+            this.drawObj(collisionPair.o1 , 0xFFFF00);
+            this.drawObj(collisionPair.o2 , 0xFFFF00);
+        });
     }
 
     init() {
+        if (this.initPromise) return this.initPromise;
+
         this.viewportWidth = window.innerWidth;
         this.viewportHeight = window.innerHeight;
-
         this.stage = new PIXI.Container();
         
 
@@ -33,19 +44,27 @@ class SpaaaceRenderer extends Renderer {
             });
         }
 
-        return new Promise((resolve, reject)=>{
-            PIXI.loader.add(Object.keys(this.ASSETPATHS).map( x => {
+        this.initPromise = new Promise((resolve, reject)=>{
+            let onLoadComplete = () => {
+                this.isReady = true;
+                resolve();
+            };
+
+            let resourceList = Object.keys(this.ASSETPATHS).map( x => {
                 return {
                     name: x,
                     url: this.ASSETPATHS[x]
                 };
-            }))
-                .load(() => {
-                    this.isReady = true;
-                    this.setupStage();
-                    resolve();
-                });
+            });
+
+            // make sure there are actual resources in the queue
+            if (resourceList.length > 0)
+                PIXI.loader.add(resourceList).load(onLoadComplete);
+            else
+                onLoadComplete();
         });
+
+        return this.initPromise;
     }
 
     onDOMLoaded() {
@@ -53,21 +72,10 @@ class SpaaaceRenderer extends Renderer {
         document.body.querySelector('.pixiContainer').appendChild(this.renderer.view);
     }
 
-    setupStage() {
-
-        this.bg = new PIXI.extras.TilingSprite(
-            PIXI.loader.resources.bg.texture,
-            this.gameEngine.worldSettings.width,
-            this.gameEngine.worldSettings.width);
-
-        this.layer1.addChild(this.bg);
-    }
-
     draw() {
         super.draw();
 
         if (!this.isReady) return; // assets might not have been loaded yet
-
         for (let objId of Object.keys(this.sprites)) {
             let objData = this.gameEngine.world.objects[objId];
             let sprite = this.sprites[objId];
@@ -77,15 +85,25 @@ class SpaaaceRenderer extends Renderer {
                 sprite.y = objData.position.y;
             }
         }
-
         this.renderer.render(this.stage);
     }
 
-    addObject(objData) {
-        let sprite;
+    drawObj(objData, color){
+        let sprite = this.sprites[objData.id];
+        sprite.clear();
+        sprite.beginFill(color);
+        sprite.drawRect(0, 0, objData.width, objData.height);
+        sprite.endFill();
+    }
 
+    addObject(objData) {
+        let sprite= new PIXI.Graphics();
         sprite.position.set(objData.position.x, objData.position.y);
         this.stage.addChild(sprite);
+
+        this.sprites[objData.id] = sprite;
+
+        this.drawObj(objData, 0xFFFF00);
 
         return sprite;
     }
@@ -102,4 +120,4 @@ class SpaaaceRenderer extends Renderer {
 
 }
 
-module.exports = SpaaaceRenderer;
+module.exports = TestRenderer;

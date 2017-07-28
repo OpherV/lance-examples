@@ -1,14 +1,13 @@
 const ClientEngine = require('lance-gg').ClientEngine;
-const SpaaaceRenderer = require('./SpaaaceRenderer');
-const KeyboardControls = require('lance-gg').controls.Keyboard;
-
-class SpaaaceClientEngine extends ClientEngine {
+const Renderer = require('./renderer');
+class clientEngine extends ClientEngine {
 
     constructor(gameEngine, options) {
-        super(gameEngine, options, SpaaaceRenderer);
+        super(gameEngine, options, Renderer);
 
-        this.serializer.registerClass(require('./Circle'));
+        this.serializer.registerClass(require('./Rect'));
     }
+    
 }
 
-module.exports = SpaaaceClientEngine;
+module.exports = clientEngine;
