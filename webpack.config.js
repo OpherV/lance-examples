@@ -36,16 +36,16 @@ module.exports = {
                 ],
                 loader: 'babel-loader',
                 query: {
-                    presets: ['es2015']
+                    presets: [
+                        'babel-preset-es2015'
+                    ].map(require.resolve),
                 }
             }
-        ],
-
-        rules: [
-            {
-                test: /(ServerEngine|CannonPhysicsEngine)/,
-                loader: 'null-loader'
-            }
         ]
+    },
+    resolve: {
+        alias: {
+            lance: path.resolve(__dirname, 'node_modules/lance-gg/src/'),
+        }
     }
 };

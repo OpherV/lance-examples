@@ -1,6 +1,6 @@
-const DynamicObject = require('lance-gg').serialize.DynamicObject;
+import DynamicObject from 'lance/serialize/DynamicObject'
 
-class Circle extends DynamicObject {
+export default class Circle extends DynamicObject {
 
     constructor(id, position) {
         super(id, position);
@@ -8,5 +8,3 @@ class Circle extends DynamicObject {
     };
 
 }
-
-module.exports = Circle;

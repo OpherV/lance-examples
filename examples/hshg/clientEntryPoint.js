@@ -1,12 +1,12 @@
-const ClientEngine = require('./ClientEngine');
-const GameEngine = require('./GameEngine');
+import TestClientEngine from './TestClientEngine';
+import TestGameEngine from './TestGameEngine';
 
 const options  = {
     standaloneMode: true
 };
 
 // create a client engine and a game engine
-const gameEngine = new GameEngine(options);
-const clientEngine = new ClientEngine(gameEngine, options);
+const gameEngine = new TestGameEngine(options);
+const clientEngine = new TestClientEngine(gameEngine, options);
 
 clientEngine.start();

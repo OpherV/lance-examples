@@ -1,7 +1,7 @@
-const PIXI = require('pixi.js');
-const Renderer = require('lance-gg').render.Renderer;
+import 'pixi.js';
+import Renderer from 'lance/render/Renderer'
 
-class TestRenderer extends Renderer {
+export default class TestRenderer extends Renderer {
 
     get ASSETPATHS() {
         return {
@@ -119,5 +119,3 @@ class TestRenderer extends Renderer {
     }
 
 }
-
-module.exports = TestRenderer;
